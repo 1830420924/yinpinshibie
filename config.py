@@ -22,7 +22,7 @@ RANDOM_SEED = 42
 MODEL_ARCH = "cnn_v2"  # cnn_v1 兼容旧模型，cnn_v2 用于提升当前训练效果。
 
 # DROPOUT 是 Dropout 概率；训练时随机丢掉部分神经元，减少过拟合。
-DROPOUT = 0.35
+DROPOUT = 0.2
 
 
 # ────────────────────────────────────────────────
