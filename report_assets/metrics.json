@@ -1,0 +1,287 @@
+{
+  "checkpoint": {
+    "epoch": 76,
+    "arch": "cnn_v2",
+    "val_acc_saved": 0.9673524150268337,
+    "config": {
+      "sample_rate": 22050,
+      "duration": 3.0,
+      "n_mels": 128,
+      "label_smoothing": 0.05,
+      "dropout": 0.35
+    }
+  },
+  "evaluation": {
+    "accuracy": 0.9673524150268337,
+    "val_samples": 2236,
+    "train_samples": 8904,
+    "total_samples": 11140,
+    "classification_report": {
+      "aloe": {
+        "precision": 0.9732142857142857,
+        "recall": 0.990909090909091,
+        "f1-score": 0.9819819819819819,
+        "support": 110.0
+      },
+      "burger": {
+        "precision": 0.9745762711864406,
+        "recall": 0.9663865546218487,
+        "f1-score": 0.9704641350210971,
+        "support": 119.0
+      },
+      "cabbage": {
+        "precision": 0.98989898989899,
+        "recall": 0.98,
+        "f1-score": 0.9849246231155779,
+        "support": 100.0
+      },
+      "candied_fruits": {
+        "precision": 0.98125,
+        "recall": 0.9691358024691358,
+        "f1-score": 0.9751552795031055,
+        "support": 162.0
+      },
+      "carrots": {
+        "precision": 0.9849624060150376,
+        "recall": 0.9924242424242424,
+        "f1-score": 0.9886792452830189,
+        "support": 132.0
+      },
+      "chips": {
+        "precision": 0.9929577464788732,
+        "recall": 0.9791666666666666,
+        "f1-score": 0.986013986013986,
+        "support": 144.0
+      },
+      "chocolate": {
+        "precision": 0.9818181818181818,
+        "recall": 0.9310344827586207,
+        "f1-score": 0.9557522123893806,
+        "support": 58.0
+      },
+      "drinks": {
+        "precision": 1.0,
+        "recall": 0.9830508474576272,
+        "f1-score": 0.9914529914529915,
+        "support": 59.0
+      },
+      "fries": {
+        "precision": 0.9618320610687023,
+        "recall": 0.9767441860465116,
+        "f1-score": 0.9692307692307692,
+        "support": 129.0
+      },
+      "grapes": {
+        "precision": 0.9829059829059829,
+        "recall": 0.9913793103448276,
+        "f1-score": 0.9871244635193133,
+        "support": 116.0
+      },
+      "gummies": {
+        "precision": 0.935251798561151,
+        "recall": 0.9558823529411765,
+        "f1-score": 0.9454545454545454,
+        "support": 136.0
+      },
+      "ice-cream": {
+        "precision": 0.986013986013986,
+        "recall": 0.9657534246575342,
+        "f1-score": 0.9757785467128027,
+        "support": 146.0
+      },
+      "jelly": {
+        "precision": 0.9634146341463414,
+        "recall": 0.8876404494382022,
+        "f1-score": 0.9239766081871345,
+        "support": 89.0
+      },
+      "noodles": {
+        "precision": 0.9425287356321839,
+        "recall": 0.9879518072289156,
+        "f1-score": 0.9647058823529412,
+        "support": 83.0
+      },
+      "pickles": {
+        "precision": 0.9772727272727273,
+        "recall": 0.9828571428571429,
+        "f1-score": 0.98005698005698,
+        "support": 175.0
+      },
+      "pizza": {
+        "precision": 0.944,
+        "recall": 0.9672131147540983,
+        "f1-score": 0.9554655870445344,
+        "support": 122.0
+      },
+      "ribs": {
+        "precision": 0.9574468085106383,
+        "recall": 0.9183673469387755,
+        "f1-score": 0.9375,
+        "support": 98.0
+      },
+      "salmon": {
+        "precision": 0.9696969696969697,
+        "recall": 0.9504950495049505,
+        "f1-score": 0.96,
+        "support": 101.0
+      },
+      "soup": {
+        "precision": 0.9032258064516129,
+        "recall": 1.0,
+        "f1-score": 0.9491525423728814,
+        "support": 56.0
+      },
+      "wings": {
+        "precision": 0.9134615384615384,
+        "recall": 0.9405940594059405,
+        "f1-score": 0.926829268292683,
+        "support": 101.0
+      },
+      "accuracy": 0.9673524150268337,
+      "macro avg": {
+        "precision": 0.9657864464916821,
+        "recall": 0.9658492965712654,
+        "f1-score": 0.9654849823992862,
+        "support": 2236.0
+      },
+      "weighted avg": {
+        "precision": 0.9677757724811871,
+        "recall": 0.9673524150268337,
+        "f1-score": 0.9673314704020418,
+        "support": 2236.0
+      }
+    },
+    "per_class_acc": {
+      "aloe": 0.990909090909091,
+      "burger": 0.9663865546218487,
+      "cabbage": 0.98,
+      "candied_fruits": 0.9691358024691358,
+      "carrots": 0.9924242424242424,
+      "chips": 0.9791666666666666,
+      "chocolate": 0.9310344827586207,
+      "drinks": 0.9830508474576272,
+      "fries": 0.9767441860465116,
+      "grapes": 0.9913793103448276,
+      "gummies": 0.9558823529411765,
+      "ice-cream": 0.9657534246575342,
+      "jelly": 0.8876404494382022,
+      "noodles": 0.9879518072289156,
+      "pickles": 0.9828571428571429,
+      "pizza": 0.9672131147540983,
+      "ribs": 0.9183673469387755,
+      "salmon": 0.9504950495049505,
+      "soup": 1.0,
+      "wings": 0.9405940594059405
+    },
+    "top_confusions": [
+      {
+        "true": "jelly",
+        "pred": "gummies",
+        "count": 5
+      },
+      {
+        "true": "ice-cream",
+        "pred": "gummies",
+        "count": 4
+      },
+      {
+        "true": "jelly",
+        "pred": "noodles",
+        "count": 3
+      },
+      {
+        "true": "ribs",
+        "pred": "wings",
+        "count": 3
+      },
+      {
+        "true": "burger",
+        "pred": "pizza",
+        "count": 2
+      },
+      {
+        "true": "burger",
+        "pred": "wings",
+        "count": 2
+      },
+      {
+        "true": "cabbage",
+        "pred": "pickles",
+        "count": 2
+      },
+      {
+        "true": "chips",
+        "pred": "wings",
+        "count": 2
+      },
+      {
+        "true": "gummies",
+        "pred": "jelly",
+        "count": 2
+      },
+      {
+        "true": "gummies",
+        "pred": "soup",
+        "count": 2
+      }
+    ]
+  },
+  "class_counts": {
+    "aloe": 546,
+    "burger": 595,
+    "cabbage": 499,
+    "candied_fruits": 806,
+    "carrots": 660,
+    "chips": 719,
+    "chocolate": 290,
+    "drinks": 292,
+    "fries": 644,
+    "grapes": 579,
+    "gummies": 678,
+    "ice-cream": 727,
+    "jelly": 442,
+    "noodles": 411,
+    "pickles": 872,
+    "pizza": 609,
+    "ribs": 488,
+    "salmon": 501,
+    "soup": 278,
+    "wings": 504
+  },
+  "classes": [
+    "aloe",
+    "burger",
+    "cabbage",
+    "candied_fruits",
+    "carrots",
+    "chips",
+    "chocolate",
+    "drinks",
+    "fries",
+    "grapes",
+    "gummies",
+    "ice-cream",
+    "jelly",
+    "noodles",
+    "pickles",
+    "pizza",
+    "ribs",
+    "salmon",
+    "soup",
+    "wings"
+  ],
+  "training_log_runs": [
+    {
+      "name": "留痕",
+      "epochs": 50,
+      "best_val_acc": 82.5,
+      "best_epoch": 49
+    },
+    {
+      "name": "留痕2",
+      "epochs": 50,
+      "best_val_acc": 76.44,
+      "best_epoch": 48
+    }
+  ]
+}
