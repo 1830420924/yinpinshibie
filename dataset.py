@@ -423,6 +423,12 @@ def get_dataloaders(data_dir: str, cache_dir: str):
 
         # 丢弃最后一个不满 batch 的小批次，让每个训练 batch 大小一致。
         drop_last=True,
+
+        # 让 DataLoader 子进程跨 epoch 保持存活，减少 Windows 反复启动进程的开销。
+        persistent_workers=True if NUM_WORKERS > 0 else False,
+
+        # 每个 worker 预取更多 batch，尽量减少 GPU 等待数据的时间。
+        prefetch_factor=4 if NUM_WORKERS > 0 else None,
     )
 
     # 创建验证 DataLoader；验证时不需要打乱，便于复现和排查。
@@ -441,6 +447,12 @@ def get_dataloaders(data_dir: str, cache_dir: str):
 
         # 固定内存同样有利于 GPU 验证阶段的数据拷贝。
         pin_memory=True,
+
+        # 验证阶段同样复用 worker，避免每轮验证前重新创建子进程。
+        persistent_workers=True if NUM_WORKERS > 0 else False,
+
+        # 验证阶段也提前预取 batch，让评估过程更连贯。
+        prefetch_factor=4 if NUM_WORKERS > 0 else None,
     )
 
     # 打印训练集和验证集样本数量。

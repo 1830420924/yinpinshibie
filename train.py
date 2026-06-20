@@ -13,6 +13,12 @@
 # 导入 time，用来统计每个 epoch 训练和验证一共花了多少秒。
 import time
 
+# 导入 csv，用来把每一轮训练指标写入 training_history.csv。
+import csv
+
+# 导入 Path，用来稳定拼接项目根目录和报告素材目录。
+from pathlib import Path
+
 # 导入 PyTorch 主库；模型、张量、GPU 操作都依赖它。
 import torch
 
@@ -38,6 +44,62 @@ from dataset import get_dataloaders
 from model import build_model, count_params
 
 
+# PROJECT_ROOT 表示当前 train.py 所在的项目根目录。
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+# REPORT_ASSETS_DIR 表示训练曲线和指标文件所在的报告素材目录。
+REPORT_ASSETS_DIR = PROJECT_ROOT / "report_assets"
+
+# TRAINING_HISTORY_CSV_PATH 是逐轮训练历史 CSV 的保存路径。
+TRAINING_HISTORY_CSV_PATH = REPORT_ASSETS_DIR / "training_history.csv"
+
+
+# 定义训练历史保存函数；训练中每轮结束都会刷新一次 CSV。
+def save_history_csv(history, path=TRAINING_HISTORY_CSV_PATH):
+    # 确保 report_assets 目录存在，避免写 CSV 时因为目录缺失而报错。
+    REPORT_ASSETS_DIR.mkdir(exist_ok=True)
+
+    # 以 UTF-8 和 newline="" 打开文件，保证 Windows 下 CSV 不多出空行。
+    with path.open("w", newline="", encoding="utf-8") as f:
+        # 创建 CSV 写入器，后续逐行写入表头和指标。
+        writer = csv.writer(f)
+
+        # 写入表头，说明每一列分别代表轮次、总轮数、损失、准确率、学习率和耗时。
+        writer.writerow([
+            "epoch", "total_epochs", "train_loss", "val_loss",
+            "train_acc", "val_acc", "lr", "elapsed"
+        ])
+
+        # 遍历已经记录的全部 epoch；各指标列表长度保持一致。
+        for idx in range(len(history["train_loss"])):
+            # 写入当前 epoch 的一行训练记录。
+            writer.writerow([
+                # idx 从 0 开始，所以展示给用户和报告时要加 1。
+                idx + 1,
+
+                # 保存本次训练计划的总轮数，便于后续绘制完整曲线标签。
+                NUM_EPOCHS,
+
+                # 保存训练集平均损失。
+                history["train_loss"][idx],
+
+                # 保存验证集平均损失。
+                history["val_loss"][idx],
+
+                # 保存训练准确率百分数，和日志显示格式保持一致。
+                history["train_acc"][idx] * 100,
+
+                # 保存验证准确率百分数，供报告脚本直接读取。
+                history["val_acc"][idx] * 100,
+
+                # 保存当前学习率，方便分析调度器变化。
+                history["lr"][idx],
+
+                # 保存当前 epoch 总耗时，便于估算训练成本。
+                history["elapsed"][idx],
+            ])
+
+
 # ────────────────────────────────────────────────
 # 工具函数：训练开始前和每一轮训练/验证都会用到
 # ────────────────────────────────────────────────
@@ -56,6 +118,12 @@ def seed_everything(seed: int):
 
     # 让 cuDNN 自动寻找更快的卷积算法；输入形状稳定时通常可以加速训练。
     torch.backends.cudnn.benchmark = True
+
+    # 允许 cuDNN 在支持的 NVIDIA GPU 上使用 TF32，加快卷积计算。
+    torch.backends.cudnn.allow_tf32 = True
+
+    # 允许矩阵乘法使用 TF32，提高 Ampere 及更新显卡上的训练吞吐。
+    torch.backends.cuda.matmul.allow_tf32 = True
 
 
 # 定义“训练一个 epoch”的函数；一个 epoch 表示模型完整看一遍训练集。
@@ -222,7 +290,14 @@ def main():
     no_improve = 0
 
     # history 用列表记录每一轮的训练/验证损失和准确率，方便后续画曲线。
-    history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
+    history = {
+        "train_loss": [],
+        "val_loss": [],
+        "train_acc": [],
+        "val_acc": [],
+        "lr": [],
+        "elapsed": [],
+    }
 
     # 打印训练开始信息，告诉用户计划训练多少个 epoch。
     print(f"\n开始训练，共 {NUM_EPOCHS} 个 epoch\n")
@@ -258,6 +333,15 @@ def main():
 
         # 记录当前 epoch 的验证准确率。
         history["val_acc"].append(val_acc)
+
+        # 记录当前学习率，方便后续画图或检查调度器是否按预期工作。
+        history["lr"].append(lr_now)
+
+        # 记录当前 epoch 耗时，后续可用于报告训练效率。
+        history["elapsed"].append(elapsed)
+
+        # 每轮结束立即落盘训练历史，避免中断训练时丢失前面 epoch 的记录。
+        save_history_csv(history)
 
         # 打印本轮的核心指标，方便边训练边观察模型是否进步。
         print(
@@ -340,6 +424,22 @@ def main():
     print(f"\n训练完成！最佳验证准确率: {best_val_acc*100:.2f}%")
 
     # 返回 history，方便其他脚本导入 main 时继续使用训练曲线数据。
+    try:
+        # 训练结束后尝试自动刷新报告素材，减少手动再运行脚本的步骤。
+        from generate_report_assets import main as generate_report_assets_main
+
+        # 调用报告素材脚本，更新 metrics.json、训练曲线和混淆矩阵等文件。
+        generate_report_assets_main()
+
+        # 打印刷新成功的图片路径，方便用户确认输出位置。
+        print(f"[report] training curves updated: {REPORT_ASSETS_DIR / 'training_curves.png'}")
+
+    # 捕获报告素材刷新失败，避免因为报告生成问题影响模型训练结果返回。
+    except Exception as e:
+        # 给出警告信息，用户可以之后单独运行 generate_report_assets.py 排查。
+        print(f"[warning] failed to refresh report assets: {e}")
+
+    # 返回完整训练历史，供交互式调用或其他脚本继续分析。
     return history
 
 

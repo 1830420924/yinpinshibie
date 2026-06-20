@@ -50,6 +50,60 @@ ASSET_DIR = BASE_DIR / "report_assets"
 # METRICS 读取 metrics.json，里面保存类别、准确率、混淆矩阵分析等结果。
 METRICS = json.loads((ASSET_DIR / "metrics.json").read_text(encoding="utf-8"))
 
+# CHECKPOINT 保存当前 best_model.pth 对应的最优轮次和验证准确率。
+CHECKPOINT = METRICS["checkpoint"]
+
+# EVALUATION 保存本次评估的验证集规模、分类报告和混淆分析结果。
+EVALUATION = METRICS["evaluation"]
+
+# REPORT 是 sklearn classification_report 的结构化结果。
+REPORT = EVALUATION["classification_report"]
+
+# TRAINING_RUN 保存最新逐轮训练历史的摘要。
+TRAINING_RUN = METRICS.get("training_log_runs", [{}])[0]
+
+
+# 定义百分比格式化函数；支持 0.9445 这类小数和 94.45 这类百分数。
+def fmt_pct(value):
+    # 转成浮点数，便于统一处理。
+    value = float(value)
+
+    # 小于等于 1 的值按小数准确率处理。
+    if value <= 1:
+        value *= 100
+
+    # 保留两位小数，和报告表格中的格式一致。
+    return f"{value:.2f}%"
+
+
+# 定义类别召回率格式化函数。
+def class_recall(name):
+    # classification_report 中每个类别的 recall 就是该类验证样本的召回率。
+    return fmt_pct(REPORT[name]["recall"])
+
+
+# 定义类别精确率格式化函数。
+def class_precision(name):
+    # classification_report 中每个类别的 precision 反映被预测为该类时的可靠程度。
+    return fmt_pct(REPORT[name]["precision"])
+
+
+# 定义类别 F1 格式化函数。
+def class_f1(name):
+    # F1 综合精确率和召回率。
+    return fmt_pct(REPORT[name]["f1-score"])
+
+
+# 定义从 top_confusions 中读取指定误分数量的函数。
+def confusion_count(true_name, pred_name):
+    # 遍历最新误分列表，查找指定 true -> pred 组合。
+    for item in EVALUATION["top_confusions"]:
+        if item["true"] == true_name and item["pred"] == pred_name:
+            return item["count"]
+
+    # 未进入 top_confusions 的组合按 0 处理，避免报告误写旧数字。
+    return 0
+
 
 # CN_FONT 是正文中文字体。
 CN_FONT = "宋体"
@@ -608,7 +662,7 @@ def add_cover(doc):
         doc.add_paragraph()
 
     # 添加日期。
-    add_centered(doc, "2026年6月16日", size=12, font=CN_FONT)
+    add_centered(doc, "2026年6月20日", size=12, font=CN_FONT)
 
     # 封面结束后插入分页符。
     doc.add_page_break()
@@ -634,7 +688,7 @@ def add_abstract(doc):
         doc,
 
         # 摘要正文第二段。
-        "当前最终模型采用 cnn_v2 结构，在验证集 2236 条样本上取得 96.74% 的准确率。与早期 cnn_v1 留痕实验相比，最终模型通过更深的双卷积模块、SiLU 激活、Dropout2d 正则化、类别权重和 SpecAugment 数据增强显著提升了识别效果。项目代码包含训练、预测、数据缓存和模型保存功能，能够支持单个音频文件的 Top-5 类别预测。",
+        f"当前最终模型采用 {CHECKPOINT['arch']} 结构，在验证集 {EVALUATION['val_samples']} 条样本上取得 {fmt_pct(EVALUATION['accuracy'])} 的准确率，最优 checkpoint 保存于第 {CHECKPOINT['epoch']} 轮。与早期 cnn_v1 留痕实验相比，最终模型通过更深的双卷积模块、SiLU 激活、Dropout2d 正则化、类别权重和 SpecAugment 数据增强显著提升了识别效果。项目代码包含训练、预测、数据缓存和模型保存功能，能够支持单个音频文件的 Top-5 类别预测。",
     )
 
     # 新增关键词段落。
@@ -679,7 +733,7 @@ def add_dataset_section(doc):
         doc,
 
         # 数据规模正文。
-        "数据集共包含 20 个类别、11140 条音频样本。类别包括 aloe、burger、cabbage、candied_fruits、carrots、chips、chocolate、drinks、fries、grapes、gummies、ice-cream、jelly、noodles、pickles、pizza、ribs、salmon、soup 和 wings。项目使用分层划分方式按照约 8:2 的比例划分训练集和验证集，当前代码对应训练样本 8904 条、验证样本 2236 条。",
+        f"数据集共包含 {len(METRICS['classes'])} 个类别、{EVALUATION['total_samples']} 条音频样本。类别包括 aloe、burger、cabbage、candied_fruits、carrots、chips、chocolate、drinks、fries、grapes、gummies、ice-cream、jelly、noodles、pickles、pizza、ribs、salmon、soup 和 wings。项目使用分层划分方式按照约 8:2 的比例划分训练集和验证集，当前代码对应训练样本 {EVALUATION['train_samples']} 条、验证样本 {EVALUATION['val_samples']} 条。",
     )
 
     # 创建类别表格的数据行列表。
@@ -894,7 +948,7 @@ def add_experiment_section(doc):
         ["模型", "cnn_v2"],
 
         # 训练轮数行。
-        ["训练轮数", "80"],
+        ["训练轮数", TRAINING_RUN.get("epochs", 60)],
 
         # 批量大小行。
         ["批量大小", "128"],
@@ -936,7 +990,7 @@ def add_experiment_section(doc):
         doc,
 
         # 对比实验正文。
-        "项目迭代过程中保留了两份 cnn_v1 训练留痕，并在最终版本中切换到更强的 cnn_v2。对比目标是观察模型容量、双卷积模块和更充分训练轮数对验证准确率的影响。早期 cnn_v1 的参数量约为 423,796，最终 cnn_v2 参数量为 1,243,572；二者均使用 Mel 频谱图作为输入，但 cnn_v2 的特征提取能力更强。",
+        f"项目迭代过程中保留了两份 cnn_v1 训练留痕，并在最终版本中切换到更强的 {CHECKPOINT['arch']}。对比目标是观察模型容量、双卷积模块和更充分训练轮数对验证准确率的影响。早期 cnn_v1 的参数量约为 423,796，最终 cnn_v2 参数量为 1,243,572；二者均使用 Mel 频谱图作为输入。本次刷新后的 cnn_v2 完成 {TRAINING_RUN.get('epochs', 60)} 轮训练，并在第 {CHECKPOINT['epoch']} 轮取得 {fmt_pct(EVALUATION['accuracy'])} 的最佳验证准确率。",
     )
 
     # 定义模型迭代对比表数据。
@@ -948,7 +1002,7 @@ def add_experiment_section(doc):
         ["cnn_v1 留痕实验 2", "423,796", "50", "76.44%", "留痕2.txt"],
 
         # 最终 cnn_v2 模型结果。
-        ["cnn_v2 最终模型", "1,243,572", "80", "96.74%", "best_model.pth"],
+        ["cnn_v2 最终模型", "1,243,572", TRAINING_RUN.get("epochs", 60), fmt_pct(EVALUATION["accuracy"]), "best_model.pth"],
     ]
 
     # 添加表 6 标题。
@@ -972,7 +1026,7 @@ def add_result_section(doc):
         doc,
 
         # 训练过程分析正文。
-        "从保留的两次 cnn_v1 训练日志可以看到，训练损失整体下降，训练准确率稳步上升；验证曲线在前中期波动较明显，说明进食声音类别之间存在一定相似性，且较浅模型在类别边界处容易不稳定。图3 中星标表示最终保存的 cnn_v2 模型最优验证点，该模型在第 76 轮达到 96.74% 的验证准确率。由于最终 cnn_v2 训练过程未单独导出完整逐轮 history 文件，图中连续曲线来自项目中保留的完整训练日志，checkpoint 元数据作为最终结果依据。",
+        f"最新训练历史记录覆盖 {TRAINING_RUN.get('epochs', 60)} 轮，训练损失和验证损失整体下降，训练准确率与验证准确率稳步上升并在后期趋于收敛。图3 中星标表示最终保存的 {CHECKPOINT['arch']} 模型最优验证点，该模型在第 {CHECKPOINT['epoch']} 轮达到 {fmt_pct(EVALUATION['accuracy'])} 的验证准确率；第 {CHECKPOINT['epoch']} 轮之后验证准确率仅在 94% 左右小幅波动，说明模型已经接近当前配置下的收敛区间。",
     )
 
     # 添加训练曲线图。
@@ -1029,7 +1083,7 @@ def add_result_section(doc):
         doc,
 
         # 结果总结正文。
-        "最终模型在验证集上的准确率、宏平均 F1 和加权平均 F1 均达到 96% 左右，说明模型不仅在样本数量较多的类别上表现较好，也能在 chocolate、drinks、soup 等样本较少的类别上保持较高识别能力。类别权重与 label smoothing 对类别不均衡问题起到了缓解作用。",
+        f"最终模型在验证集上的准确率为 {fmt_pct(EVALUATION['accuracy'])}，宏平均 F1 为 {fmt_pct(REPORT['macro avg']['f1-score'])}，加权平均 F1 为 {fmt_pct(REPORT['weighted avg']['f1-score'])}。这些结果说明模型在多数类别上已经具备稳定识别能力，同时类别权重与 label smoothing 对类别不均衡问题起到了缓解作用；但 jelly、burger、chocolate 等相对易混或样本较少的类别仍拉低了整体上限。",
     )
 
     # 添加混淆矩阵二级标题。
@@ -1053,7 +1107,7 @@ def add_result_section(doc):
         doc,
 
         # 混淆矩阵分析正文。
-        f"混淆矩阵显示，大多数类别的样本集中分布在主对角线附近，说明模型整体分类稳定。误分较多的组合主要包括 {confusion_text}。这些类别在声音上具有相近的纹理或进食动作特征，例如 jelly 与 gummies 都可能包含软质食物的咀嚼声音，ribs 与 wings 都属于肉类咀嚼或啃咬声音，因此容易在少量样本中被混淆。",
+        f"混淆矩阵显示，大多数类别的样本集中分布在主对角线附近，说明模型整体分类稳定。误分较多的组合主要包括 {confusion_text}。最新结果中最明显的混淆不再是旧报告中的 ribs→wings，而是 burger→wings（{confusion_count('burger', 'wings')} 条）、ice-cream→gummies（{confusion_count('ice-cream', 'gummies')} 条）、pickles→ice-cream（{confusion_count('pickles', 'ice-cream')} 条）以及 jelly→gummies / jelly→noodles 两组软质食物相关误分。",
     )
 
     # 添加单类表现和改进方向分析。
@@ -1062,7 +1116,7 @@ def add_result_section(doc):
         doc,
 
         # 改进方向正文。
-        "从单类召回率看，soup、carrots、grapes、aloe、noodles 等类别表现较好；jelly、ribs、wings 等类别仍有提升空间。后续可通过增加相似类别样本、引入更强的数据增强、采用混合卷积与注意力机制，或在推理阶段融合更长音频片段的多窗口预测来进一步降低混淆。",
+        f"重点看 jelly、gummies、noodles：jelly 的召回率为 {class_recall('jelly')}，在 89 条验证样本中有 {confusion_count('jelly', 'gummies')} 条被判为 gummies、{confusion_count('jelly', 'noodles')} 条被判为 noodles，是当前最需要补强的类别；gummies 的召回率为 {class_recall('gummies')}、精确率为 {class_precision('gummies')}，同时吸收了来自 ice-cream 和 jelly 的样本，说明软糖类声音边界仍偏宽；noodles 的召回率达到 {class_recall('noodles')}，但精确率为 {class_precision('noodles')}，主要问题不是自身漏判，而是少量 jelly 样本被吸收到 noodles。后续可针对软质/半流质食物增加样本、加入更贴近咀嚼黏连声的增强方式，并在推理阶段使用多窗口投票降低短片段偶然误判。",
     )
 
     # 添加项目应用与不足二级标题。
@@ -1083,7 +1137,7 @@ def add_result_section(doc):
         doc,
 
         # 不足与改进正文。
-        "当前项目主要不足在于最终训练过程未保存完整的逐轮 history 文件和 TensorBoard 日志，导致最终 cnn_v2 的完整训练曲线无法直接复现到报告中；此外，数据集中部分类别样本数量差异较大，真实场景下的录音设备、背景噪声和进食者差异也可能影响泛化能力。后续改进方向包括保存训练日志、增加独立测试集、加入噪声增强、尝试预训练音频模型以及记录更多推理案例。",
+        "当前项目已经保存逐轮 training_history.csv、主要评估图和 metrics.json，能够复现实验曲线与本次报告指标。主要不足在于仍缺少独立测试集和跨设备、跨噪声场景验证；此外，数据集中部分类别样本数量差异较大，jelly、gummies、noodles 等声音边界接近的类别仍存在误分。后续改进方向包括扩充相似类别样本、加入真实环境噪声增强、尝试预训练音频模型、记录更多推理案例，并对软质食物类别进行更细的错误样本回听分析。",
     )
 
 

@@ -1,62 +1,62 @@
 {
   "checkpoint": {
-    "epoch": 76,
+    "epoch": 56,
     "arch": "cnn_v2",
-    "val_acc_saved": 0.9673524150268337,
+    "val_acc_saved": 0.9445438282647585,
     "config": {
       "sample_rate": 22050,
       "duration": 3.0,
       "n_mels": 128,
       "label_smoothing": 0.05,
-      "dropout": 0.35
+      "dropout": 0.2
     }
   },
   "evaluation": {
-    "accuracy": 0.9673524150268337,
+    "accuracy": 0.9445438282647585,
     "val_samples": 2236,
     "train_samples": 8904,
     "total_samples": 11140,
     "classification_report": {
       "aloe": {
-        "precision": 0.9732142857142857,
-        "recall": 0.990909090909091,
-        "f1-score": 0.9819819819819819,
+        "precision": 0.9722222222222222,
+        "recall": 0.9545454545454546,
+        "f1-score": 0.963302752293578,
         "support": 110.0
       },
       "burger": {
-        "precision": 0.9745762711864406,
-        "recall": 0.9663865546218487,
-        "f1-score": 0.9704641350210971,
+        "precision": 0.9304347826086956,
+        "recall": 0.8991596638655462,
+        "f1-score": 0.9145299145299145,
         "support": 119.0
       },
       "cabbage": {
-        "precision": 0.98989898989899,
-        "recall": 0.98,
-        "f1-score": 0.9849246231155779,
+        "precision": 0.979381443298969,
+        "recall": 0.95,
+        "f1-score": 0.9644670050761421,
         "support": 100.0
       },
       "candied_fruits": {
-        "precision": 0.98125,
-        "recall": 0.9691358024691358,
-        "f1-score": 0.9751552795031055,
+        "precision": 0.9512195121951219,
+        "recall": 0.9629629629629629,
+        "f1-score": 0.9570552147239264,
         "support": 162.0
       },
       "carrots": {
-        "precision": 0.9849624060150376,
+        "precision": 0.9703703703703703,
         "recall": 0.9924242424242424,
-        "f1-score": 0.9886792452830189,
+        "f1-score": 0.9812734082397003,
         "support": 132.0
       },
       "chips": {
-        "precision": 0.9929577464788732,
-        "recall": 0.9791666666666666,
-        "f1-score": 0.986013986013986,
+        "precision": 0.9787234042553191,
+        "recall": 0.9583333333333334,
+        "f1-score": 0.968421052631579,
         "support": 144.0
       },
       "chocolate": {
-        "precision": 0.9818181818181818,
-        "recall": 0.9310344827586207,
-        "f1-score": 0.9557522123893806,
+        "precision": 0.9629629629629629,
+        "recall": 0.896551724137931,
+        "f1-score": 0.9285714285714286,
         "support": 58.0
       },
       "drinks": {
@@ -66,63 +66,63 @@
         "support": 59.0
       },
       "fries": {
-        "precision": 0.9618320610687023,
-        "recall": 0.9767441860465116,
-        "f1-score": 0.9692307692307692,
+        "precision": 0.924812030075188,
+        "recall": 0.9534883720930233,
+        "f1-score": 0.9389312977099237,
         "support": 129.0
       },
       "grapes": {
-        "precision": 0.9829059829059829,
-        "recall": 0.9913793103448276,
-        "f1-score": 0.9871244635193133,
+        "precision": 0.9743589743589743,
+        "recall": 0.9827586206896551,
+        "f1-score": 0.9785407725321889,
         "support": 116.0
       },
       "gummies": {
-        "precision": 0.935251798561151,
-        "recall": 0.9558823529411765,
-        "f1-score": 0.9454545454545454,
+        "precision": 0.9259259259259259,
+        "recall": 0.9191176470588235,
+        "f1-score": 0.922509225092251,
         "support": 136.0
       },
       "ice-cream": {
-        "precision": 0.986013986013986,
-        "recall": 0.9657534246575342,
-        "f1-score": 0.9757785467128027,
+        "precision": 0.9084967320261438,
+        "recall": 0.952054794520548,
+        "f1-score": 0.9297658862876255,
         "support": 146.0
       },
       "jelly": {
-        "precision": 0.9634146341463414,
-        "recall": 0.8876404494382022,
-        "f1-score": 0.9239766081871345,
+        "precision": 0.927710843373494,
+        "recall": 0.8651685393258427,
+        "f1-score": 0.8953488372093024,
         "support": 89.0
       },
       "noodles": {
-        "precision": 0.9425287356321839,
-        "recall": 0.9879518072289156,
-        "f1-score": 0.9647058823529412,
+        "precision": 0.9101123595505618,
+        "recall": 0.9759036144578314,
+        "f1-score": 0.9418604651162791,
         "support": 83.0
       },
       "pickles": {
-        "precision": 0.9772727272727273,
-        "recall": 0.9828571428571429,
-        "f1-score": 0.98005698005698,
+        "precision": 0.9647058823529412,
+        "recall": 0.9371428571428572,
+        "f1-score": 0.9507246376811594,
         "support": 175.0
       },
       "pizza": {
-        "precision": 0.944,
-        "recall": 0.9672131147540983,
-        "f1-score": 0.9554655870445344,
+        "precision": 0.9504132231404959,
+        "recall": 0.9426229508196722,
+        "f1-score": 0.9465020576131687,
         "support": 122.0
       },
       "ribs": {
-        "precision": 0.9574468085106383,
-        "recall": 0.9183673469387755,
-        "f1-score": 0.9375,
+        "precision": 0.9270833333333334,
+        "recall": 0.9081632653061225,
+        "f1-score": 0.9175257731958762,
         "support": 98.0
       },
       "salmon": {
-        "precision": 0.9696969696969697,
-        "recall": 0.9504950495049505,
-        "f1-score": 0.96,
+        "precision": 0.9680851063829787,
+        "recall": 0.900990099009901,
+        "f1-score": 0.9333333333333333,
         "support": 101.0
       },
       "soup": {
@@ -132,97 +132,97 @@
         "support": 56.0
       },
       "wings": {
-        "precision": 0.9134615384615384,
-        "recall": 0.9405940594059405,
-        "f1-score": 0.926829268292683,
+        "precision": 0.8648648648648649,
+        "recall": 0.9504950495049505,
+        "f1-score": 0.9056603773584906,
         "support": 101.0
       },
-      "accuracy": 0.9673524150268337,
+      "accuracy": 0.9445438282647585,
       "macro avg": {
-        "precision": 0.9657864464916821,
-        "recall": 0.9658492965712654,
-        "f1-score": 0.9654849823992862,
+        "precision": 0.9447554889875086,
+        "recall": 0.9442467019328162,
+        "f1-score": 0.9439464486510871,
         "support": 2236.0
       },
       "weighted avg": {
-        "precision": 0.9677757724811871,
-        "recall": 0.9673524150268337,
-        "f1-score": 0.9673314704020418,
+        "precision": 0.9453997915933845,
+        "recall": 0.9445438282647585,
+        "f1-score": 0.9445324241448096,
         "support": 2236.0
       }
     },
     "per_class_acc": {
-      "aloe": 0.990909090909091,
-      "burger": 0.9663865546218487,
-      "cabbage": 0.98,
-      "candied_fruits": 0.9691358024691358,
+      "aloe": 0.9545454545454546,
+      "burger": 0.8991596638655462,
+      "cabbage": 0.95,
+      "candied_fruits": 0.9629629629629629,
       "carrots": 0.9924242424242424,
-      "chips": 0.9791666666666666,
-      "chocolate": 0.9310344827586207,
+      "chips": 0.9583333333333334,
+      "chocolate": 0.896551724137931,
       "drinks": 0.9830508474576272,
-      "fries": 0.9767441860465116,
-      "grapes": 0.9913793103448276,
-      "gummies": 0.9558823529411765,
-      "ice-cream": 0.9657534246575342,
-      "jelly": 0.8876404494382022,
-      "noodles": 0.9879518072289156,
-      "pickles": 0.9828571428571429,
-      "pizza": 0.9672131147540983,
-      "ribs": 0.9183673469387755,
-      "salmon": 0.9504950495049505,
+      "fries": 0.9534883720930233,
+      "grapes": 0.9827586206896551,
+      "gummies": 0.9191176470588235,
+      "ice-cream": 0.952054794520548,
+      "jelly": 0.8651685393258427,
+      "noodles": 0.9759036144578314,
+      "pickles": 0.9371428571428572,
+      "pizza": 0.9426229508196722,
+      "ribs": 0.9081632653061225,
+      "salmon": 0.900990099009901,
       "soup": 1.0,
-      "wings": 0.9405940594059405
+      "wings": 0.9504950495049505
     },
     "top_confusions": [
       {
-        "true": "jelly",
+        "true": "burger",
+        "pred": "wings",
+        "count": 7
+      },
+      {
+        "true": "ice-cream",
         "pred": "gummies",
         "count": 5
       },
       {
-        "true": "ice-cream",
+        "true": "pickles",
+        "pred": "ice-cream",
+        "count": 5
+      },
+      {
+        "true": "jelly",
         "pred": "gummies",
         "count": 4
       },
       {
         "true": "jelly",
         "pred": "noodles",
-        "count": 3
+        "count": 4
       },
       {
         "true": "ribs",
-        "pred": "wings",
-        "count": 3
-      },
-      {
-        "true": "burger",
-        "pred": "pizza",
-        "count": 2
-      },
-      {
-        "true": "burger",
-        "pred": "wings",
-        "count": 2
+        "pred": "fries",
+        "count": 4
       },
       {
         "true": "cabbage",
         "pred": "pickles",
-        "count": 2
+        "count": 3
       },
       {
-        "true": "chips",
-        "pred": "wings",
-        "count": 2
+        "true": "chocolate",
+        "pred": "ice-cream",
+        "count": 3
+      },
+      {
+        "true": "fries",
+        "pred": "burger",
+        "count": 3
       },
       {
         "true": "gummies",
         "pred": "jelly",
-        "count": 2
-      },
-      {
-        "true": "gummies",
-        "pred": "soup",
-        "count": 2
+        "count": 3
       }
     ]
   },
@@ -272,16 +272,10 @@
   ],
   "training_log_runs": [
     {
-      "name": "留痕",
-      "epochs": 50,
-      "best_val_acc": 82.5,
-      "best_epoch": 49
-    },
-    {
-      "name": "留痕2",
-      "epochs": 50,
-      "best_val_acc": 76.44,
-      "best_epoch": 48
+      "name": "latest_training",
+      "epochs": 60,
+      "best_val_acc": 94.45438282647585,
+      "best_epoch": 56
     }
   ]
 }

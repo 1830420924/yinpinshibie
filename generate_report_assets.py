@@ -10,6 +10,9 @@
 # 从 pathlib 导入 Path，用来处理项目路径和素材输出路径。
 from pathlib import Path
 
+# 导入 csv，用来读取 train.py 保存的逐轮训练历史。
+import csv
+
 # 导入 json，用来把评估指标保存成 metrics.json。
 import json
 
@@ -50,6 +53,9 @@ ASSET_DIR = BASE_DIR / "report_assets"
 # 确保素材目录存在；exist_ok=True 表示已经存在也不报错。
 ASSET_DIR.mkdir(exist_ok=True)
 
+# TRAINING_HISTORY_CSV_PATH 指向最新训练过程导出的 CSV 历史记录。
+TRAINING_HISTORY_CSV_PATH = ASSET_DIR / "training_history.csv"
+
 # 把项目根目录加入模块搜索路径，保证后面能 import config、dataset、model。
 sys.path.insert(0, str(BASE_DIR))
 
@@ -63,7 +69,53 @@ from dataset import PrecomputedMelDataset, ValMelDataset, _stratified_split  # n
 from model import build_model  # noqa: E402
 
 
-# 定义训练日志解析函数；它会扫描项目根目录下的 txt 文件。
+# 定义准确率百分数统一函数；兼容 0.96 和 96.0 两种记录方式。
+def _accuracy_percent(value):
+    # 先转成 float，兼容 CSV 中读出来的字符串数值。
+    value = float(value)
+
+    # 小于等于 1 的值按小数准确率处理，否则认为已经是百分数。
+    return value * 100 if value <= 1 else value
+
+
+# 定义 CSV 训练历史读取函数；优先读取 train.py 新生成的结构化记录。
+def _read_history_csv(path):
+    # records 用来保存每一轮训练的结构化指标。
+    records = []
+
+    # 按 UTF-8 打开 CSV，newline="" 可以正确处理 Windows 换行。
+    with path.open(newline="", encoding="utf-8") as f:
+        # DictReader 会按表头把每一行转换成字典。
+        reader = csv.DictReader(f)
+
+        # 逐行读取 epoch 指标。
+        for row in reader:
+            # 把 CSV 字符串转换成绘图和 JSON 所需的数字类型。
+            records.append({
+                # 当前 epoch 序号。
+                "epoch": int(float(row["epoch"])),
+
+                # 总 epoch 数；旧 CSV 没有该列时退回当前 epoch。
+                "total_epochs": int(float(row.get("total_epochs") or row["epoch"])),
+
+                # 训练平均损失。
+                "train_loss": float(row["train_loss"]),
+
+                # 训练准确率统一转成百分数。
+                "train_acc": _accuracy_percent(row["train_acc"]),
+
+                # 验证平均损失。
+                "val_loss": float(row["val_loss"]),
+
+                # 验证准确率统一转成百分数。
+                "val_acc": _accuracy_percent(row["val_acc"]),
+            })
+
+    # 返回全部训练轮次记录。
+    return records
+
+
+# 定义训练日志解析函数；它优先读取 CSV，缺少 CSV 时再扫描项目根目录下的 txt 文件。
 def parse_training_logs():
     """从训练留痕 txt 中提取每轮 loss 和 accuracy，供训练曲线图使用。"""
     # 编译正则表达式，匹配 train.py 打印的 Epoch 指标行。
@@ -78,6 +130,16 @@ def parse_training_logs():
 
     # runs 用来保存每个日志文件解析出的训练记录。
     runs = []
+
+    # 如果最新训练历史 CSV 存在，优先使用它生成曲线，避免继续依赖旧留痕文本。
+    if TRAINING_HISTORY_CSV_PATH.exists():
+        # 读取结构化 CSV 记录。
+        records = _read_history_csv(TRAINING_HISTORY_CSV_PATH)
+
+        # 只有读到有效记录时才提前返回。
+        if records:
+            # 返回值保持和旧 txt 解析逻辑一致，便于后面的绘图函数复用。
+            return [{"name": "latest_training", "records": records}]
 
     # 遍历项目根目录下所有 .txt 文件。
     for path in sorted(BASE_DIR.glob("*.txt")):

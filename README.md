@@ -10,7 +10,8 @@
 - 支持 CUDA GPU 加速、AMP 混合精度训练、类别权重、标签平滑、早停和学习率调度。
 - 支持 Mel 频谱缓存，第一次处理数据后，后续训练速度更快。
 - 支持单条音频 Top-5 预测输出。
-- 支持生成实验图表、评估指标和课程报告素材。
+- 支持生成实验图表、评估指标、逐轮训练历史 CSV 和课程报告素材。
+- 主要 Python 源码已补充面向初学者的中文说明注释，重点代码行均配有对应解释。
 
 ## 项目结构
 
@@ -24,8 +25,15 @@
 ├── generate_report_assets.py  # 生成实验指标、图表和报告素材
 ├── build_report_docx.py       # 生成 Word 项目报告
 ├── report_assets/             # 实验指标和图表素材
-└── 报告资产/                  # 报告相关资料
+├── report_render*/            # 报告渲染或导出过程中的中间结果
+├── archive/                   # 原始音频数据集目录
+├── mel_cache/                 # Mel 频谱缓存目录
+└── best_model.pth             # 当前保存的最佳模型权重
 ```
+
+## 源码注释状态
+
+项目中的 `config.py`、`dataset.py`、`model.py`、`train.py`、`predict.py`、`generate_report_assets.py` 和 `build_report_docx.py` 已整理为中文高覆盖注释版本。注释重点说明每个配置项、数据处理步骤、模型层、训练流程、预测流程、报告素材生成流程和 Word 报告生成流程，方便课程答辩、代码检查和后续维护。
 
 ## 环境依赖
 
@@ -97,6 +105,8 @@ python train.py
 
 训练完成后，最佳模型会保存到 `MODEL_SAVE_PATH` 指定的位置。
 
+训练过程中还会持续更新 `report_assets/training_history.csv`，记录每一轮的训练损失、验证损失、训练准确率、验证准确率、学习率和耗时。训练结束后，`train.py` 会尝试自动调用 `generate_report_assets.py` 刷新训练曲线、混淆矩阵和 `metrics.json`。
+
 ## 使用模型预测
 
 训练完成并生成 `best_model.pth` 后，可以运行：
@@ -129,6 +139,7 @@ python generate_report_assets.py
 - 混淆矩阵
 - 类别分布图
 - 训练曲线图
+- `report_assets/training_history.csv`
 - `report_assets/metrics.json`
 
 ## 生成 Word 报告
@@ -150,12 +161,12 @@ python build_report_docx.py
 根据仓库中的 `report_assets/metrics.json`，当前最佳模型信息如下：
 
 - 模型结构：`cnn_v2`
-- 最佳 epoch：76
+- 最佳 epoch：56
 - 验证集样本数：2236
 - 训练集样本数：8904
 - 总样本数：11140
-- 验证准确率：96.74%
-- 加权 F1-score：96.73%
+- 验证准确率：94.45%
+- 加权 F1-score：94.45%
 
 ## 注意事项
 

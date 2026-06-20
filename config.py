@@ -90,13 +90,13 @@ F_MAX = 8000  # 单位 Hz。
 # ────────────────────────────────────────────────
 
 # BATCH_SIZE 是每次喂给模型的样本数量；越大越吃显存，但统计更稳定。
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 
 # MEL_CACHE_DIR 是 Mel 频谱缓存目录；缓存后训练不用每次重新读音频算频谱。
 MEL_CACHE_DIR = r"D:\昆明城市学院\音频识别\mel_cache"
 
 # NUM_EPOCHS 是最多训练轮数；一轮 epoch 表示模型完整看一遍训练集。
-NUM_EPOCHS = 80
+NUM_EPOCHS = 60
 
 # LEARNING_RATE 是初始学习率；可以理解成模型每次改参数的“步子大小”。
 LEARNING_RATE = 8e-4
@@ -111,7 +111,7 @@ TRAIN_RATIO = 0.8
 NUM_WORKERS = 4
 
 # EARLY_STOP_PATIENCE 是早停耐心值；验证准确率连续这么多轮不提升就停止。
-EARLY_STOP_PATIENCE = 15
+EARLY_STOP_PATIENCE = 5
 
 # LABEL_SMOOTHING 是标签平滑系数；让模型不要对单一类别过度自信。
 LABEL_SMOOTHING = 0.05
